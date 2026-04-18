@@ -3,11 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	"ozon-basket/storage/map_cart"
 )
 
 const (
 	countOfArgs = 3
 )
+
+type storage interface {
+	AddToCart(userID, productID, count int64)
+	GetCartByUserID(userID int64) map_cart.Cart
+}
 
 func main() {
 	var (
@@ -23,7 +29,10 @@ func main() {
 		return
 	}
 
-	AddToCart(*userID, *productID, *count)
+	cartsStorage := map_cart.New()
+	cartsStorage.AddToCart(*userID, *productID, *count)
+
+	fmt.Println(cartsStorage.GetCartByUserID(*userID))
 
 }
 
