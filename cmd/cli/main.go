@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"ozon-basket/storage/map_cart"
+	"ozon-basket/models"
+	"ozon-basket/storage/json_cart"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 
 type storage interface {
 	AddToCart(userID, productID, count int64)
-	GetCartByUserID(userID int64) map_cart.Cart
+	GetCartByUserID(userID int64) models.ICart
 }
 
 func main() {
@@ -29,13 +30,17 @@ func main() {
 		return
 	}
 
-	cartsStorage := map_cart.New()
+	jsonCart, err := json_cart.New("storage/json_cart/carts.json")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	var cartsStorage storage
+
+	cartsStorage = jsonCart
 	cartsStorage.AddToCart(*userID, *productID, *count)
 
-	fmt.Println(cartsStorage.GetCartByUserID(*userID))
+	fmt.Println(cartsStorage.GetCartByUserID(*userID).GetCountByProductID(*productID))
 
-}
-
-func AddToCart(userID, productID, count int64) {
-	fmt.Printf("user %d add product wuth id=%d (count %d)\n", userID, productID, count)
 }
